@@ -1,5 +1,7 @@
 from django.db import models
-from django.conf import settings
+
+
+"""Модель для добавления книг"""
 
 
 class Book(models.Model):
@@ -8,7 +10,7 @@ class Book(models.Model):
         verbose_name='Название книги'
     )
     cover = models.ImageField(
-        upload_to='uploads/images/',  # Папка, куда будут сохраняться изображения
+        upload_to='uploads/images/',
         verbose_name='Обложка книги',
         blank=False,
     )
