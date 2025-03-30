@@ -1,10 +1,15 @@
 from django.shortcuts import render
-
-# Create your views here.
+from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
-
 from bookshelf.models import Book, BookShelRating, BookShelf
+
+
+def greeting(request):
+    return HttpResponse('<H2>Здорово, Бандиты!</H2>')
+
+def bookshelf(request):
+    return render(request, 'bookshelf/index.html')
 
 
 class ShelfMixin(ContextMixin):
@@ -32,3 +37,4 @@ class BookShelRatingDetailView(DetailView, ShelfMixin):
 
 class BookShelfDetailView(DetailView, ShelfMixin):
     model = BookShelf
+
