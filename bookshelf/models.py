@@ -1,6 +1,5 @@
 from django.db import models
 
-
 """Модель для добавления книг"""
 
 
@@ -14,6 +13,61 @@ class Book(models.Model):
         verbose_name='Обложка книги',
         blank=False,
     )
+
+    class Meta:
+        verbose_name = 'Книга'
+        verbose_name_plural = 'Книги'
+
+    def __str__(self):
+        return self.title
+
+
+"""Модель для добавления рейтинга внутри книжной полки"""
+
+
+class BookShelRating(models.Model):
+    title = models.CharField(
+        verbose_name='Наименование рейтинга',
+        max_length=64,
+        null=True,
+        blank=True
+    )
+
+    books = models.ManyToManyField('Book', related_name='bookshelf_rating', blank=True)
+
+    weight = models.PositiveSmallIntegerField(
+        verbose_name='Вес кейса',
+        default=0,
+        help_text='Необязательный параметр. Чем выше вес рейтинга тем выше он в списке'
+    )
+
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+        ordering = ['-weight']
+
+    def __str__(self):
+        return self.title
+
+
+"""Модель для добавления книжной полки"""
+
+
+class BookShelf(models.Model):
+    title = models.CharField(
+        verbose_name='Название полки',
+        max_length=64,
+        null=True,
+        blank=True
+    )
+
+    slug = models.SlugField(default='')
+
+    bookshelf_rating = models.ManyToManyField('BookShelRating', related_name='bookshelf_rating', blank=True)
+
+    class Meta:
+        verbose_name = 'Полка'
+        verbose_name_plural = 'Полки'
 
     def __str__(self):
         return self.title
