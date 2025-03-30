@@ -22,13 +22,13 @@ class ShelfMixin(ContextMixin):
         return context_product
 
 
-class BookListView(ListView, ProductMixin):
+class BookListView(ListView, ShelfMixin):
     model = Book
 
 
-class BookShelRatingDetailView(DetailView, ProductMixin):
+class BookShelRatingDetailView(DetailView, ShelfMixin):
     model = BookShelRating
 
 
-class BookShelfDetailView(DetailView, ProductMixin):
+class BookShelfDetailView(DetailView, ShelfMixin):
     model = BookShelf
