@@ -50,6 +50,27 @@ class BookShelRating(models.Model):
         return self.title
 
 
+"""Модель для добавления библиотеки"""
+
+
+class Library(models.Model):
+    title = models.CharField(
+        verbose_name='Библиотека',
+        max_length=128,
+        null=True,
+        blank=True
+    )
+
+    slug = models.SlugField(default='')
+
+    class Meta:
+        verbose_name = 'Библиотека'
+        verbose_name_plural = 'Библиотеки'
+
+    def __str__(self):
+        return self.title
+
+
 """Модель для добавления книжной полки"""
 
 
@@ -63,7 +84,16 @@ class BookShelf(models.Model):
 
     slug = models.SlugField(default='')
 
-    bookshelf_rating = models.ManyToManyField('BookShelRating', related_name='bookshelf_rating', blank=True)
+    library = models.ForeignKey(
+        Library,
+        null=True,
+        blank=True,
+        verbose_name='Библиотека',
+        related_name='bookshelves',
+        on_delete=models.CASCADE,
+    )
+
+    bookshelf_rating = models.ManyToManyField('Book', related_name='Book', blank=True)
 
     class Meta:
         verbose_name = 'Полка'

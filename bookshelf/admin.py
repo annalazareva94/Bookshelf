@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, BookShelRating, BookShelf
+from .models import Book, BookShelRating, BookShelf, Library
 
 models = [Book, BookShelRating, BookShelf]
 
@@ -12,7 +12,7 @@ class BookShelRatingInline(admin.TabularInline):
 
 
 class BookShelfInline(admin.TabularInline):
-    model = BookShelf.bookshelf_rating.through
+    model = BookShelf
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -22,4 +22,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 class BookShelfAdmin(admin.ModelAdmin):
     exclude = ('bookshelf_rating',)
+    inlines = [BookShelfInline]
+
+
+@admin.register(Library)
+class LibraryAdmin(admin.ModelAdmin):
     inlines = [BookShelfInline]
