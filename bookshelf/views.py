@@ -6,10 +6,10 @@ from bookshelf.models import Book, BookShelRating, BookShelf
 
 
 def greeting(request):
-    return HttpResponse('<H2>Здорово, Бандиты!</H2>')
+    return render(request, 'bookshelf/base.html')
 
 def bookshelf(request):
-    return render(request, 'bookshelf/index.html')
+    return render(request, 'bookshelf/base.html')
 
 
 class ShelfMixin(ContextMixin):

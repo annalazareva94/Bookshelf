@@ -8,7 +8,7 @@ for model in models:
 
 
 class BookShelRatingInline(admin.TabularInline):
-    model = BookShelRating.books.through
+    model = Book.rating
 
 
 class BookShelfInline(admin.TabularInline):
