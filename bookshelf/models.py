@@ -61,8 +61,6 @@ class Library(models.Model):
         blank=True
     )
 
-    slug = models.SlugField(default='')
-
     class Meta:
         verbose_name = 'Библиотека'
         verbose_name_plural = 'Библиотеки'
@@ -81,8 +79,6 @@ class BookShelf(models.Model):
         null=True,
         blank=True
     )
-
-    slug = models.SlugField(default='')
 
     library = models.ForeignKey(
         Library,

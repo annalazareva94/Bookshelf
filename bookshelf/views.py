@@ -1,15 +1,16 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import ContextMixin
 from bookshelf.models import Book, BookShelRating, BookShelf
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import BookSerializer
 
 
-def greeting(request):
-    return HttpResponse('<H2>Здорово, Бандиты!</H2>')
-
-def bookshelf(request):
-    return render(request, 'bookshelf/index.html')
+class BookListAPI(APIView):
+    def get(self, request):
+        books = Book.objects.all()
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
 
 
 class ShelfMixin(ContextMixin):
@@ -37,4 +38,3 @@ class BookShelRatingDetailView(DetailView, ShelfMixin):
 
 class BookShelfDetailView(DetailView, ShelfMixin):
     model = BookShelf
-
