@@ -1,9 +1,7 @@
-from django.views.generic import ListView, DetailView
-from django.views.generic.base import ContextMixin
 from bookshelf.models import Book, BookShelRating, BookShelf
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import BookSerializer
+from .serializers import BookSerializer, BookShelRatingSerializer, BookShelfSerializer
 
 
 class BookListAPI(APIView):
@@ -13,28 +11,15 @@ class BookListAPI(APIView):
         return Response(serializer.data)
 
 
-class ShelfMixin(ContextMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(self.get_context_product(self.request, **kwargs))
-        return context
-
-    def get_context_product(self, request, **kwargs):
-        context_product = {
-            'all_books_list': Book.objects.all(),
-            'book_shelf_rating': BookShelRating.objects.all(),
-            'book_shelf_list': BookShelf.objects.all(),
-        }
-        return context_product
+class BookShelRatingAPI(APIView):
+    def get(self, request):
+        rating = BookShelRating.objects.all()
+        serializer = BookShelRatingSerializer(rating, many=True)
+        return Response(serializer.data)
 
 
-class BookListView(ListView, ShelfMixin):
-    model = Book
-
-
-class BookShelRatingDetailView(DetailView, ShelfMixin):
-    model = BookShelRating
-
-
-class BookShelfDetailView(DetailView, ShelfMixin):
-    model = BookShelf
+class BookShelfAPI(APIView):
+    def get(self, request):
+        shelf = BookShelf.objects.all()
+        serializer = BookShelfSerializer(shelf, many=True)
+        return Response(serializer.data)
