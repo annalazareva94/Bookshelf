@@ -2,7 +2,12 @@ from bookshelf.models import Book, BookShelRating, BookShelf
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.views.generic import TemplateView
 from .serializers import BookSerializer, BookShelRatingSerializer, BookShelfSerializer
+
+
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
 
 class BookListAPI(APIView):
