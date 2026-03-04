@@ -1,5 +1,20 @@
 import {useRef, useState} from 'react';
 
+const getCookie = (name) => {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
 const CreateBook = ({ onBookCreated }) => { // принимаем проп
 
     const [title, setTitle] = useState('');
@@ -31,8 +46,14 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
     }
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/api/books/', {
+        const csrftoken = getCookie('csrftoken');
+
+        const response = await fetch('/api/books/', {
         method: 'POST',
+        credentials: 'include',
+        headers: {
+            'X-CSRFToken': csrftoken,
+          },
         body: formData,
     });
 
