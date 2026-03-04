@@ -24,8 +24,9 @@ from bookshelf.views import IndexView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('bookshelf.urls')),
-    re_path(r'^.*', IndexView.as_view(), name='index'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [re_path(r'^.*', IndexView.as_view(), name='index')]
