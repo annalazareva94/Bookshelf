@@ -1,3 +1,4 @@
+import React from 'react'
 import {useRef, useState} from 'react';
 
 const getCookie = (name) => {
@@ -48,7 +49,8 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
     try {
         const csrftoken = getCookie('csrftoken');
 
-        const response = await fetch('/api/books/', {
+        // http://localhost:8000 should be removed! it's  a temporary measure
+        const response = await fetch('http://localhost:8000/api/books/', {
         method: 'POST',
         credentials: 'include',
         headers: {
