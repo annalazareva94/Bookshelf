@@ -34,7 +34,15 @@ body {
     cursor: pointer;
 }
 
-.rating-zone h3 {
+.book-item h3 {
+    margin: 0;
+}
 
+.book-item {
+    display: flex;
+    flex-direction: column;
+    max-width: 149px;
+    justify-content: center;
+    text-align: center;
 }
 

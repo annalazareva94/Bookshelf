@@ -1,24 +1,47 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useDroppable } from '@dnd-kit/core';
+import BookItem from "./BookItem.jsx";
 
-const RatingZone = ({ rating, books }) => {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `rating-${rating}`,
+const RatingZone = ({ name, rating, books, onNameChange }) => {
+  const { setNodeRef } = useDroppable({
+    id: rating,
   });
 
-  const style = {
-    backgroundColor: isOver ? '#e0f7fa' : '#f5f5f5',
-    minHeight: '100px',
-    padding: '8px',
-    margin: '8px 0',
+  const [text, setNewName] = useState(name);
+
+  //the function is called when the user finishes editing - removes focus from the element
+  const handleBlur = (e) => {
+    const newText = e.currentTarget.textContent;
+    if (newText !== text) {
+      setNewName(newText);
+      onNameChange?.(rating, newText);
+    }
   };
 
+  const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.currentTarget.blur();
+      }
+    };
+
+  useEffect(() => {
+      setNewName(name);
+    }, [name]);
+
   return (
-    <div ref={setNodeRef} style={style}>
-      <h3>Рейтинг {rating}</h3>
+    <div ref={setNodeRef}>
+      <h3
+          contentEditable="true"
+          onBlur={handleBlur}
+          suppressContentEditableWarning={true}
+          onKeyDown={handleKeyDown}
+      >
+        {text}
+      </h3>
       <div className="books-in-rating">
         {books.map(book => (
-          <div key={book.id}>{book.title}</div>
+            <BookItem key={book.id} book={book} fromRatingId={rating} />
         ))}
       </div>
     </div>

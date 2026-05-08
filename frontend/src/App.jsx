@@ -3,67 +3,107 @@ import { useEffect, useState } from "react"
 import CreateBook from "./components/CreateBook.jsx";
 import BookList from "./components/BookList.jsx";
 import TemplateBookshelf from "./components/TemplateBookshelf.jsx";
-import TemplateButton from "./components/TemplateButton.jsx";
 import {DndContext} from '@dnd-kit/core';
 
 
 const App = () => {
-    const [books, setBooks] = useState([])
-    const [template, setTemplate] = useState(null);
-
-    const handleDragEnd = (event) => {
-      const { active, over } = event;
-      if (!over) return; // бросили не в зону
-
-      const book = active.data.current?.book;
-      if (!book) return;
-
-      // Извлекаем рейтинг из id зоны (например, "rating-5")
-      const ratingId = over.id;
-      const rating = parseInt(ratingId.split('-')[1], 10);
-      if (isNaN(rating)) return;
-
-      // Проверяем, есть ли шаблон
-      if (!template) return;
-
-      // Находим индекс зоны с таким рейтингом
-      const ratingIndex = template.ratings.findIndex(r => r.rating === rating);
-      if (ratingIndex === -1) return;
-
-      // Проверяем, нет ли уже такой книги в этой зоне
-      if (template.ratings[ratingIndex].books.some(b => b.id === book.id)) return;
-
-      // Создаём новый массив с добавленной книгой
-      const newRatings = [...template.ratings];
-      newRatings[ratingIndex] = {
-        ...newRatings[ratingIndex],
-        books: [...newRatings[ratingIndex].books, book],
-      };
-
-      // Обновляем шаблон
-      updateTemplate({ ...template, ratings: newRatings });
-    };
-
-    useEffect(() => {
-        // http://localhost:8000 should be removed! it's  a temporary measure
-        fetch("http://localhost:8000/api/books/")
-            .then(res => res.json())
-            .then(data => {
-            setBooks(data)
-    })
-        .catch(error => console.error("Error:", error))
-    }, [])
-
-
-    // Загружаем шаблон из localStorage при монтировании
-    useEffect(() => {
+    // Function to bootstrap from localStorage (runs once)
+    const getInitialTemplate = () => {
         const saved = localStorage.getItem('bookshelfTemplate');
         if (saved) {
-          setTemplate(JSON.parse(saved));
+          try {
+            return JSON.parse(saved);
+          } catch (e) {
+            console.error('Error localStorage', e);
+          }
         }
+        // Default template if there is nothing in localStorage
+        return {
+          ratings: [
+            { id: 5, name: 'Rating 5', rating: 5, books: [] },
+            { id: 4, name: 'Rating 4', rating: 4, books: [] },
+            { id: 3, name: 'Rating 3', rating: 3, books: [] },
+            { id: 2, name: 'Rating 2', rating: 2, books: [] },
+            { id: 1, name: 'Rating 1', rating: 1, books: [] },
+          ]
+        };
+    };
+
+    const [books, setBooks] = useState([])
+    const [template, setTemplate] = useState(getInitialTemplate);
+
+    const handleDragEnd = (event) => {
+        //event is a packet of information about the drag and drop. From it, we extract:
+        //active — that they were dragging (the book)
+        //over - the zone where they were dropped
+      const { active, over } = event;
+      if (!over) return;
+
+      const activeData = active.data.current;
+      if (!activeData || !activeData.book) return;
+
+      const book = activeData.book;
+      const fromRatingId = activeData.fromRatingId; // number if the book is from the zone, otherwise undefined
+      const toRatingId = over.id; //id of the zone where it was dropped
+
+      if (!template) return;
+
+      // target zone index
+      const toRatingIndex = template.ratings.findIndex(r => r.id === toRatingId);
+      if (toRatingIndex === -1) return;
+
+        // If the book is already in the target zone, do nothing
+      if (template.ratings[toRatingIndex].books.some(b => b.id === book.id)) return;
+
+      // create a copy of the shelf to modify it
+      let newRatings = [...template.ratings];
+
+      // if the book was from a different zone, we delete it from there
+      if (fromRatingId !== undefined) {
+        const fromRatingIndex = template.ratings.findIndex(r => r.id === fromRatingId);
+        if (fromRatingIndex !== -1) {
+          newRatings[fromRatingIndex] = {
+            ...newRatings[fromRatingIndex],
+            books: newRatings[fromRatingIndex].books.filter(b => b.id !== book.id),
+          };
+        }
+      }
+      // if the book was from library, we delete it from there
+      else {
+        setBooks(prevBooks => prevBooks.filter(b => b.id !== book.id));
+      }
+
+      // adding the book to the new zone
+      newRatings[toRatingIndex] = {
+        ...newRatings[toRatingIndex],
+        books: [...newRatings[toRatingIndex].books, book],
+      };
+
+      // updating the template
+      setTemplate({ ...template, ratings: newRatings });
+    };
+
+
+    //a list of books taking into account those in the rating zone
+    useEffect(() => {
+        fetch("/api/books/")
+        .then(res => res.json())
+        .then(allBooks => {
+          // all the book IDs that are already in any template zone
+          const usedBookIds = new Set();
+          if (template && template.ratings) {
+            template.ratings.forEach(rating => {
+              rating.books.forEach(book => usedBookIds.add(book.id));
+            });
+          }
+            // we leave only those books that are not yet in any rating zone.
+          const availableBooks = allBooks.filter(book => !usedBookIds.has(book.id));
+          setBooks(availableBooks);
+        })
+        .catch(error => console.error("Error:", error));
     }, []);
 
-    // Сохраняем шаблон в localStorage при каждом изменении
+    // save the template in localStorage on each change
     useEffect(() => {
         if (template) {
           localStorage.setItem('bookshelfTemplate', JSON.stringify(template));
@@ -77,24 +117,7 @@ const App = () => {
         setBooks(prevBooks => [...prevBooks, newBook]);
     };
 
-    const createTemplate = () => {
-        const newTemplate = {
-          ratings: [
-            { rating: 5, books: [] },
-            { rating: 4, books: [] },
-            { rating: 3, books: [] },
-            { rating: 2, books: [] },
-            { rating: 1, books: [] },
-          ],
-        };
-        setTemplate(newTemplate);
-    };
-
-    const clearTemplate = () => {
-        setTemplate(null);
-    };
-
-    // Функция для обновления шаблона (например, после перетаскивания)
+    // function for updating a template (for example, after dragging)
     const updateTemplate = (newTemplate) => {
         setTemplate(newTemplate);
     };
@@ -103,16 +126,6 @@ const App = () => {
         <DndContext onDragEnd={handleDragEnd}>
             <div className="app">
                 <div className='shelf-block'>
-                    <h1>Fast template</h1>
-                    <TemplateButton onClick={createTemplate}>
-                        Create template
-                    </TemplateButton>
-                    {template && (
-                      <TemplateButton onClick={clearTemplate}>
-                        Clear template
-                      </TemplateButton>
-                    )}
-
                     <TemplateBookshelf template={template} onUpdateTemplate={updateTemplate} />
                 </div>
                 <div className='library-block'>

@@ -2,10 +2,10 @@ import React from 'react'
 import { useDraggable } from '@dnd-kit/core';
 
 
-const BookItem = ({ book }) => {
+const BookItem = ({ book, fromRatingId }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: book.id,
-    data: { book },
+    id: `book-${book.id}`,
+    data: { book, fromRatingId: fromRatingId },
   });
 
   const style = transform ? {
