@@ -122,16 +122,35 @@ const App = () => {
         setTemplate(newTemplate);
     };
 
+    const removingBookFromRating = (book, ratingId) => {
+        const ratingIndex = template.ratings.findIndex(r => r.id === ratingId);
+        if (ratingIndex === -1) return;
+
+        const newRatings = [...template.ratings];
+        newRatings[ratingIndex] = {
+        ...newRatings[ratingIndex],
+        books: newRatings[ratingIndex].books.filter(b => b.id !== book.id)
+        };
+
+        setTemplate({ ...template, ratings: newRatings });
+
+        setBooks(prevBooks => [...prevBooks, book]);
+}
+
     return (
         <DndContext onDragEnd={handleDragEnd}>
             <div className="app">
                 <div className='shelf-block'>
-                    <TemplateBookshelf template={template} onUpdateTemplate={updateTemplate} />
-                </div>
-                <div className='library-block'>
-                    <h1>Library</h1>
-                    <CreateBook onBookCreated={addBook} />
-                    <BookList books={books} />
+                    <TemplateBookshelf
+                        template={template}
+                        onUpdateTemplate={updateTemplate}
+                        onRemoveBook = {removingBookFromRating}
+                    />
+                    <div className='library-block'>
+                        <h1>Library</h1>
+                        <CreateBook onBookCreated={addBook} />
+                        <BookList books={books} />
+                    </div>
                 </div>
             </div>
         </DndContext>

@@ -2,10 +2,16 @@ import React from 'react'
 import { useDraggable } from '@dnd-kit/core';
 
 
-const BookItem = ({ book, fromRatingId }) => {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+const BookItem = ({ book, fromRatingId, inZone, onRemoveBook }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging
+  } = useDraggable({
     id: `book-${book.id}`,
-    data: { book, fromRatingId: fromRatingId },
+    data: { book, fromRatingId: fromRatingId, type: 'book', },
   });
 
   const style = transform ? {
@@ -19,7 +25,8 @@ const BookItem = ({ book, fromRatingId }) => {
       style={style}
       {...listeners}
       {...attributes}
-      className="book-item"
+      className={`book-item ${inZone ? 'in-zone' : ''}`}
+      title={book.title + ', ' + 'Rating:' + book.general_rating}
     >
       {book.cover && <img src={book.cover} alt={book.title} width="100" />}
       <h3>{book.title}</h3>

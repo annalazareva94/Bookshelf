@@ -7,7 +7,7 @@ const BookList = ({ books }) => {
     return (
         <div className="book-list">
           {books.length === 0 ? (
-            <p>No books yet</p>
+            <p>Let's add new books!</p>
           ) : (
             books.map(book => <BookItem key={book.id} book={book} />)
           )}

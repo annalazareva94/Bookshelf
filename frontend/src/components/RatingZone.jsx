@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import BookItem from "./BookItem.jsx";
+import RemoveButton from "./RemoveButton.jsx";
 
-const RatingZone = ({ name, rating, books, onNameChange }) => {
+const RatingZone = ({ name, rating, books, onNameChange, onRemoveBook }) => {
   const { setNodeRef } = useDroppable({
     id: rating,
+    data: { type: 'zone', ratingId: rating },
   });
 
   const [text, setNewName] = useState(name);
@@ -41,7 +43,18 @@ const RatingZone = ({ name, rating, books, onNameChange }) => {
       </h3>
       <div className="books-in-rating">
         {books.map(book => (
-            <BookItem key={book.id} book={book} fromRatingId={rating} />
+            <div className="book-container">
+                <BookItem
+                    key={book.id}
+                    book={book}
+                    fromRatingId={rating}
+                    inZone={true}
+                    onRemoveBook={onRemoveBook}
+                />
+                <RemoveButton
+                  onClick={() => onRemoveBook(book, rating)}
+                />
+            </div>
         ))}
       </div>
     </div>

@@ -84,6 +84,7 @@ const CreateBook = ({ onBookCreated }) => {
             <div>
                 <label htmlFor="title">Book name</label>
                 <input
+                    className='text-input'
                     type="text"
                     id="title"
                     value={title}
@@ -106,7 +107,11 @@ const CreateBook = ({ onBookCreated }) => {
             <div>
                 <label htmlFor="image">General rating</label>
                 <input
+                    className='number-input'
                   type="number"
+                  min="0.00"
+                  max="10.00"
+                  step="0.5"
                   id="rating"
                   value={rating}
                   onChange={(e) => setRating(e.target.value)}
