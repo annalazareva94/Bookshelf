@@ -1,17 +1,15 @@
+import React from 'react'
+import BookItem from "./BookItem.jsx";
+
+
 const BookList = ({ books }) => {
 
     return (
         <div className="book-list">
           {books.length === 0 ? (
-            <p>Пока нет книг</p>
+            <p>Let's add new books!</p>
           ) : (
-            books.map(book => (
-              <div key={book.id} className="book-item">
-                {book.cover && <img src={book.cover} alt={book.title} width="100" />}
-                <h3>{book.title}</h3>
-                <p>Rating: {book.general_rating}</p>
-              </div>
-            ))
+            books.map(book => <BookItem key={book.id} book={book} />)
           )}
         </div>
     );

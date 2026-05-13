@@ -1,5 +1,8 @@
+import React from 'react'
 import {useRef, useState} from 'react';
 
+// django requires this token to protect against CSRF attacks during POST requests.
+// Without it, the server will not accept the form.
 const getCookie = (name) => {
       let cookieValue = null;
       if (document.cookie && document.cookie !== '') {
@@ -15,7 +18,7 @@ const getCookie = (name) => {
       return cookieValue;
     }
 
-const CreateBook = ({ onBookCreated }) => { // принимаем проп
+const CreateBook = ({ onBookCreated }) => {
 
     const [title, setTitle] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -23,7 +26,7 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
     const fileInputRef = useRef(null);
 
     const handleFileChange = (e) => {
-        setImageFile(e.target.files[0]); // берём первый выбранный файл
+        setImageFile(e.target.files[0]);
     };
 
     const handleSubmit = async (e) => {
@@ -42,12 +45,11 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
     formData.append('general_rating', ratingNumber);
 
     if (imageFile) {
-        formData.append('cover', imageFile); // поле должно совпадать с именем, которое ждёт Django
+        formData.append('cover', imageFile); // the field must match the name django is expecting
     }
 
     try {
         const csrftoken = getCookie('csrftoken');
-
         const response = await fetch('/api/books/', {
         method: 'POST',
         credentials: 'include',
@@ -58,20 +60,18 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
     });
 
     if (response.ok) {
-        const newBook = await response.json();  // получаем созданную книгу с сервера
+        const newBook = await response.json();  // getting created book from server
         onBookCreated(newBook);
-
         setTitle('');
         setImageFile(null);
         setRating('');
-        // Сбросим также поле файла в DOM (можно обнулить input через ref)
         document.getElementById('image').value = '';
     } else {
             const error = await response.json();
-            alert('Ошибка: ' + JSON.stringify(error));
+            alert('Error: ' + JSON.stringify(error));
         }
     } catch (error) {
-        alert('Ошибка сети: ' + error.message);
+        alert('Error network: ' + error.message);
         }
     };
 
@@ -84,6 +84,7 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
             <div>
                 <label htmlFor="title">Book name</label>
                 <input
+                    className='text-input'
                     type="text"
                     id="title"
                     value={title}
@@ -106,7 +107,11 @@ const CreateBook = ({ onBookCreated }) => { // принимаем проп
             <div>
                 <label htmlFor="image">General rating</label>
                 <input
+                    className='number-input'
                   type="number"
+                  min="0.00"
+                  max="10.00"
+                  step="0.5"
                   id="rating"
                   value={rating}
                   onChange={(e) => setRating(e.target.value)}
