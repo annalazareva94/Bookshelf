@@ -1,32 +1,5 @@
 from django.db import models
 
-
-"""Модель для добавления рейтинга внутри книжной полки"""
-
-
-class BookShelRating(models.Model):
-    title = models.CharField(
-        verbose_name='Наименование рейтинга',
-        max_length=64,
-        null=True,
-        blank=True
-    )
-
-    weight = models.PositiveSmallIntegerField(
-        verbose_name='Вес кейса',
-        default=0,
-        help_text='Необязательный параметр. Чем выше вес рейтинга тем выше он в списке'
-    )
-
-    class Meta:
-        verbose_name = 'Рейтинг'
-        verbose_name_plural = 'Рейтинги'
-        ordering = ['-weight']
-
-    def __str__(self):
-        return self.title
-
-
 """Модель для добавления книг"""
 
 
@@ -41,18 +14,37 @@ class Book(models.Model):
         blank=False,
     )
 
-    rating = models.ForeignKey(
-        BookShelRating,
-        verbose_name='Рейтинг',
-        related_name='books',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-
     class Meta:
         verbose_name = 'Книга'
         verbose_name_plural = 'Книги'
+
+    def __str__(self):
+        return self.title
+
+
+"""Модель для добавления рейтинга внутри книжной полки"""
+
+
+class BookShelRating(models.Model):
+    title = models.CharField(
+        verbose_name='Наименование рейтинга',
+        max_length=64,
+        null=True,
+        blank=True
+    )
+
+    books = models.ManyToManyField('Book', related_name='bookshelf_rating', blank=True)
+
+    weight = models.PositiveSmallIntegerField(
+        verbose_name='Вес кейса',
+        default=0,
+        help_text='Необязательный параметр. Чем выше вес рейтинга тем выше он в списке'
+    )
+
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+        ordering = ['-weight']
 
     def __str__(self):
         return self.title

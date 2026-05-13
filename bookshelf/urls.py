@@ -1,8 +1,9 @@
 from django.urls import path
-from . import views
+from .views import BookListAPI, BookShelRatingAPI, BookShelfAPI
 
 
 urlpatterns = [
-    path('', views.greeting),
-    path('bookshelf', views.bookshelf)
+    path('books/', BookListAPI.as_view(), name='api-books'),
+    path('rating/', BookShelRatingAPI.as_view(), name='api-rating'),
+    path('shelf/', BookShelfAPI.as_view(), name='shelf-rating'),
 ]
