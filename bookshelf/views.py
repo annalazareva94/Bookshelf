@@ -1,40 +1,38 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.views.generic import ListView, DetailView
-from django.views.generic.base import ContextMixin
 from bookshelf.models import Book, BookShelRating, BookShelf
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.views.generic import TemplateView
+from .serializers import BookSerializer, BookShelRatingSerializer, BookShelfSerializer
 
 
-def greeting(request):
-    return HttpResponse('<H2>Здорово, Бандиты!</H2>')
-
-def bookshelf(request):
-    return render(request, 'bookshelf/index.html')
+class IndexView(TemplateView):
+    template_name = 'index.html'
 
 
-class ShelfMixin(ContextMixin):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(self.get_context_product(self.request, **kwargs))
-        return context
+class BookListAPI(APIView):
+    def get(self, request):
+        books = Book.objects.all()
+        serializer = BookSerializer(books, many=True)
+        return Response(serializer.data)
 
-    def get_context_product(self, request, **kwargs):
-        context_product = {
-            'all_books_list': Book.objects.all(),
-            'book_shelf_rating': BookShelRating.objects.all(),
-            'book_shelf_list': BookShelf.objects.all(),
-        }
-        return context_product
-
-
-class BookListView(ListView, ShelfMixin):
-    model = Book
+    def post(self, request):
+        serializer = BookSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class BookShelRatingDetailView(DetailView, ShelfMixin):
-    model = BookShelRating
+class BookShelRatingAPI(APIView):
+    def get(self, request):
+        rating = BookShelRating.objects.all()
+        serializer = BookShelRatingSerializer(rating, many=True)
+        return Response(serializer.data)
 
 
-class BookShelfDetailView(DetailView, ShelfMixin):
-    model = BookShelf
-
+class BookShelfAPI(APIView):
+    def get(self, request):
+        shelf = BookShelf.objects.all()
+        serializer = BookShelfSerializer(shelf, many=True)
+        return Response(serializer.data)
