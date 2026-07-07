@@ -1,114 +1,103 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 
-"""Model for adding books"""
+"""Модель для добавления книг"""
 
 
 class Book(models.Model):
     title = models.CharField(
         max_length=255,
-        verbose_name='Book name'
+        verbose_name='Название книги'
     )
     cover = models.ImageField(
         upload_to='uploads/images/',
-        verbose_name='Book cover',
+        verbose_name='Обложка книги',
         blank=False,
     )
 
-    general_rating = models.FloatField(
-        verbose_name='General rating',
-        validators=[MinValueValidator(0), MaxValueValidator(10)],
-        default=0,
-    )
-
     class Meta:
-        verbose_name = 'Book'
-        verbose_name_plural = 'Books'
+        verbose_name = 'Книга'
+        verbose_name_plural = 'Книги'
 
     def __str__(self):
         return self.title
 
 
-"""Model for adding rating inside book shelf"""
+"""Модель для добавления рейтинга внутри книжной полки"""
 
 
 class BookShelRating(models.Model):
     title = models.CharField(
-        verbose_name='Rating name',
+        verbose_name='Наименование рейтинга',
         max_length=64,
         null=True,
         blank=True
     )
 
-    books = models.ManyToManyField(
-        'Book',
-        related_name='books'
-    )
+    books = models.ManyToManyField('Book', related_name='bookshelf_rating', blank=True)
 
     weight = models.PositiveSmallIntegerField(
-        verbose_name='weight',
+        verbose_name='Вес кейса',
         default=0,
-        help_text='Unnecessary parameter. The higher weight, the higher rating in the list'
+        help_text='Необязательный параметр. Чем выше вес рейтинга тем выше он в списке'
     )
 
     class Meta:
-        verbose_name = 'Rating'
-        verbose_name_plural = 'Ratings'
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
         ordering = ['-weight']
 
     def __str__(self):
         return self.title
 
 
-"""Model for adding book shelf"""
+"""Модель для добавления библиотеки"""
 
 
-class BookShelf(models.Model):
+class Library(models.Model):
     title = models.CharField(
-        verbose_name='Shelf name',
-        max_length=64,
+        verbose_name='Библиотека',
+        max_length=128,
         null=True,
         blank=True
     )
 
-    books = models.ManyToManyField(
-        'Book',
-        through='ShelfBook',
-        related_name='shelves'
-    )
-
-    ratings = models.ManyToManyField(
-        'BookShelRating',
-        blank=True,
-        related_name='shelves',
-        verbose_name='Available ratings'
-    )
+    slug = models.SlugField(default='')
 
     class Meta:
-        verbose_name = 'Shelf'
-        verbose_name_plural = 'Shelves'
+        verbose_name = 'Библиотека'
+        verbose_name_plural = 'Библиотеки'
 
     def __str__(self):
         return self.title
 
 
-class ShelfBook(models.Model):
-    shelf = models.ForeignKey(
-        BookShelf,
-        on_delete=models.CASCADE
+"""Модель для добавления книжной полки"""
+
+
+class BookShelf(models.Model):
+    title = models.CharField(
+        verbose_name='Название полки',
+        max_length=64,
+        null=True,
+        blank=True
     )
 
-    book = models.ForeignKey(
-        Book,
-        on_delete=models.CASCADE
-    )
+    slug = models.SlugField(default='')
 
-    rating = models.ForeignKey(
-        BookShelRating,
+    library = models.ForeignKey(
+        Library,
         null=True,
         blank=True,
-        on_delete=models.SET_NULL
+        verbose_name='Библиотека',
+        related_name='bookshelves',
+        on_delete=models.CASCADE,
     )
 
+    bookshelf_rating = models.ManyToManyField('Book', related_name='Book', blank=True)
+
     class Meta:
-        unique_together = ('shelf', 'book')
+        verbose_name = 'Полка'
+        verbose_name_plural = 'Полки'
+
+    def __str__(self):
+        return self.title

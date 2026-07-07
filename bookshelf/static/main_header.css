@@ -1,0 +1,10 @@
+.main-header {
+    max-width: 1170px;
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+.main-header a {
+    cursor: pointer;
+}

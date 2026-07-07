@@ -1,25 +1,30 @@
 from django.contrib import admin
-from .models import Book, BookShelRating, BookShelf, ShelfBook
+from .models import Book, BookShelRating, BookShelf, Library
 
-admin.site.register(Book)
-admin.site.register(BookShelRating)
+models = [Book, BookShelRating, BookShelf]
 
-
-class BookAdmin(admin.ModelAdmin):
-    search_fields = ['title']
-    list_display = ['title', 'id']
+for model in models:
+    admin.site.register(model)
 
 
-class ShelfBookInline(admin.TabularInline):
-    model = ShelfBook
-    extra = 1
-    fields = ['book', 'rating']
+class BookShelRatingInline(admin.TabularInline):
+    model = BookShelRating.books.through
+
+
+class BookShelfInline(admin.TabularInline):
+    model = BookShelf
+
+
+class ProductAdmin(admin.ModelAdmin):
+    exclude = ('books',)
+    inlines = [BookShelRatingInline]
 
 
 class BookShelfAdmin(admin.ModelAdmin):
-    filter_horizontal = ['ratings']
-    fields = ['title', 'ratings']
-    inlines = [ShelfBookInline]
+    exclude = ('bookshelf_rating',)
+    inlines = [BookShelfInline]
 
 
-admin.site.register(BookShelf, BookShelfAdmin)
+@admin.register(Library)
+class LibraryAdmin(admin.ModelAdmin):
+    inlines = [BookShelfInline]
