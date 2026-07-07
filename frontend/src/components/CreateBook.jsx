@@ -1,23 +1,6 @@
 import React from 'react'
 import {useRef, useState} from 'react';
 
-// django requires this token to protect against CSRF attacks during POST requests.
-// Without it, the server will not accept the form.
-const getCookie = (name) => {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-
 const CreateBook = ({ onBookCreated }) => {
 
     const [title, setTitle] = useState('');
@@ -35,44 +18,28 @@ const CreateBook = ({ onBookCreated }) => {
     const ratingNumber = parseFloat(rating);
 
     if (isNaN(ratingNumber)) {
-        alert('Введите корректный рейтинг');
+        alert('Enter a valid rating');
         return;
     }
 
-    const formData = new FormData();
+        const newBook = {
+            title: title.trim(),
+            general_rating: ratingNumber,
+        };
 
-    formData.append('title', title);
-    formData.append('general_rating', ratingNumber);
+        const coverDataUrl = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(imageFile);
+        });
 
-    if (imageFile) {
-        formData.append('cover', imageFile); // the field must match the name django is expecting
-    }
+        newBook.cover = coverDataUrl;
 
-    try {
-        const csrftoken = getCookie('csrftoken');
-        const response = await fetch('/api/books/', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'X-CSRFToken': csrftoken,
-          },
-        body: formData,
-    });
-
-    if (response.ok) {
-        const newBook = await response.json();  // getting created book from server
         onBookCreated(newBook);
         setTitle('');
         setImageFile(null);
         setRating('');
-        document.getElementById('image').value = '';
-    } else {
-            const error = await response.json();
-            alert('Error: ' + JSON.stringify(error));
-        }
-    } catch (error) {
-        alert('Error network: ' + error.message);
-        }
     };
 
 

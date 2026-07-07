@@ -85,23 +85,46 @@ const App = () => {
 
 
     //a list of books taking into account those in the rating zone
+    // useEffect(() => {
+    //     fetch("/api/books/")
+    //     .then(res => res.json())
+    //     .then(allBooks => {
+    //       // all the book IDs that are already in any template zone
+    //       const usedBookIds = new Set();
+    //       if (template && template.ratings) {
+    //         template.ratings.forEach(rating => {
+    //           rating.books.forEach(book => usedBookIds.add(book.id));
+    //         });
+    //       }
+    //         // we leave only those books that are not yet in any rating zone.
+    //       const availableBooks = allBooks.filter(book => !usedBookIds.has(book.id));
+    //       setBooks(availableBooks);
+    //     })
+    //     .catch(error => console.error("Error:", error));
+    // }, []);
+
     useEffect(() => {
-        fetch("/api/books/")
-        .then(res => res.json())
-        .then(allBooks => {
-          // all the book IDs that are already in any template zone
-          const usedBookIds = new Set();
-          if (template && template.ratings) {
+        // saved list of books from localStorage
+        const savedBooks = localStorage.getItem('booksList');
+        let allBooks = [];
+        if (savedBooks) {
+            try {
+                allBooks = JSON.parse(savedBooks);
+            } catch (e) {
+                console.error('Ошибка парсинга books из localStorage', e);
+            }
+        }
+
+        // filter out books that are already in the rankings
+        const usedBookIds = new Set();
+        if (template && template.ratings) {
             template.ratings.forEach(rating => {
-              rating.books.forEach(book => usedBookIds.add(book.id));
+                rating.books.forEach(book => usedBookIds.add(book.id));
             });
-          }
-            // we leave only those books that are not yet in any rating zone.
-          const availableBooks = allBooks.filter(book => !usedBookIds.has(book.id));
-          setBooks(availableBooks);
-        })
-        .catch(error => console.error("Error:", error));
-    }, []);
+        }
+        const availableBooks = allBooks.filter(book => !usedBookIds.has(book.id));
+        setBooks(availableBooks);
+    }, []); // dependency on the template is not needed, as it is already loaded during the initial render.
 
     // save the template in localStorage on each change
     useEffect(() => {
@@ -112,9 +135,23 @@ const App = () => {
         }
     }, [template]);
 
-    // Function for adding new book to the list
+    // Function for adding new book to the common list in localStorage
     const addBook = (newBook) => {
-        setBooks(prevBooks => [...prevBooks, newBook]);
+        const bookWithId = { ...newBook, id: Date.now() };
+        setBooks(prevBooks => {
+            const updatedBooks = [...prevBooks, bookWithId];
+            localStorage.setItem('booksList', JSON.stringify(updatedBooks));
+            return updatedBooks;
+        });
+    };
+
+    // Function for deleting the book from the localStorage
+    const deleteBook = (book) => {
+        setBooks(prevBooks => {
+            const updatedBooks = prevBooks.filter(b => b.id !== book.id);
+            localStorage.setItem('booksList', JSON.stringify(updatedBooks));
+            return updatedBooks;
+        });
     };
 
     // function for updating a template (for example, after dragging)
@@ -149,7 +186,7 @@ const App = () => {
                     <div className='library-block'>
                         <h1>Library</h1>
                         <CreateBook onBookCreated={addBook} />
-                        <BookList books={books} />
+                        <BookList books={books} onDeleteBook={deleteBook} />
                     </div>
                 </div>
             </div>

@@ -141,4 +141,20 @@ body {
     z-index: 99;
 }
 
+.book-list .book-item-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.book-list .book-item-wrapper .remove-btn {
+    display: none;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 99;
+}
+
+.book-list .book-item-wrapper:hover .remove-btn{
+    display: block;
+}
 
