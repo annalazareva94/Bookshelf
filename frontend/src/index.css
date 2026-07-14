@@ -36,6 +36,11 @@ body {
     max-width: 45%;
 }
 
+.template-shelf h3 {
+    max-width: 80px;
+    width: 100%;
+}
+
 .template-shelf > div {
     min-height: 90px;
     max-height: 90px;
