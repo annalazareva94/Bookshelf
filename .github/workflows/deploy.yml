@@ -1,0 +1,63 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---- 1. Сборка React ----
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm install
+      - name: Build React
+        run: |
+          cd frontend
+          npm run build   # создаст папку frontend/dist
+
+      # ---- 2. Копирование бэкенда (Django) ----
+      - name: Deploy backend
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: '-rlgoDzvc -i --delete --exclude="frontend" --exclude="venv" --exclude="__pycache__" --exclude="*.pyc" --exclude="db.sqlite3" --exclude=".env" --exclude="node_modules" --exclude=".git" --exclude=".idea" --exclude="*.log"'
+          SOURCE: './'   # весь корень репозитория
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          TARGET: '/var/www/book-shelf/backend'   # Django-код попадёт сюда
+
+      # ---- 3. Копирование фронтенда (React) ----
+      - name: Deploy frontend
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: '-rlgoDzvc -i --delete'
+          SOURCE: 'frontend/dist/'   # папка после сборки
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          TARGET: '/var/www/book-shelf'   # прямо в корень сайта (где index.html)
+
+      # ---- 4. Миграции, статика, перезапуск Gunicorn ----
+      - name: Run Django migrations and restart services
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/book-shelf/backend
+            source venv/bin/activate
+            python manage.py migrate --noinput
+            python manage.py collectstatic --noinput
+            chown -R www-data:www-data /var/www/book-shelf/static /var/www/book-shelf/media
+            systemctl restart gunicorn
+            systemctl reload nginx
