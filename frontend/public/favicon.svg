@@ -1,0 +1,13 @@
+<svg width="44" height="48" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="4" y1="40" x2="40" y2="4" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+    <filter id="indigoShadow" x="0" y="0" width="44" height="48" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#C7D2FE" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+  <rect x="4" y="4" width="36" height="36" rx="12" fill="url(#iconGradient)" filter="url(#indigoShadow)" />
+  <path d="M17 14C15.8954 14 15 14.8954 15 16V29.25A0.75 0.75 0 0 0 16.22 29.805L22 25.47L27.78 29.805A0.75 0.75 0 0 0 29 29.25V16C29 14.8954 28.1046 14 27 14H17Z" fill="white" />
+</svg>
