@@ -1,0 +1,84 @@
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/Inter.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+  color: rgb(51 65 85 / var(--tw-text-opacity, 1));
+  font-weight: 300;
+  letter-spacing: -0.025em;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem;
+}
+
+#app {
+  max-width: 1280px;
+  margin: auto;
+}
+
+.ghost {
+  opacity: 0.1;
+}
+
+.ghost .remove-btn {
+  display: none!important;
+}
+
+.chosen {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.5;
+  transform: scale(1.05);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: #fde68a;
+  top: -50px;
+  left: -50px;
+}
+
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  background: #ddd6fe;
+  top: 30%;
+  right: -100px;
+}
+
+.orb-3 {
+  width: 350px;
+  height: 350px;
+  background: #fbcfe8;
+  bottom: -50px;
+  left: 20%;
+}
