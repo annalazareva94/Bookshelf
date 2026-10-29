@@ -1,7 +1,9 @@
-*.pyc
-*~
-__pycache__
-myvenv
-db.sqlite3
-/static
+# OS / Editor
 .DS_Store
+.idea/
+.vscode/
+
+# Env
+.env
+.env.local
+.env.*.local
