@@ -3,6 +3,7 @@ export interface Book {
   title: string
   general_rating: number
   cover?: string
+  link?: string
 }
 
 export interface Rating {

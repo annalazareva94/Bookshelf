@@ -3,13 +3,14 @@ import { ref } from 'vue'
 import uploadIcon from '@/assets/img/upload-icon.svg'
 
 const emit = defineEmits<{
-  (e: 'book-created', book: { title: string; general_rating: number; cover: string }): void
+  (e: 'book-created', book: { title: string; general_rating: number; cover: string, link: string }): void
 }>()
 
 const title = ref('')
 const imageFile = ref<File | null>(null)
 const rating = ref('')
 const fileInputRef = ref<HTMLInputElement | null>(null)
+const link = ref('')
 
 const handleFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -28,6 +29,7 @@ const handleSubmit = async () => {
   const newBook = {
     title: title.value.trim(),
     general_rating: ratingNumber,
+    link: link.value.trim() || undefined,
   }
 
   const coverDataUrl = await new Promise<string>((resolve, reject) => {
@@ -56,8 +58,13 @@ const handleSubmit = async () => {
 <template>
   <form class="form-add-book" @submit.prevent="handleSubmit">
     <div>
-      <label for="title">Book name</label>
+      <label for="title">Item name</label>
       <input class="text-input" type="text" id="title" v-model="title" required />
+    </div>
+
+    <div>
+      <label for="title">Link</label>
+      <input class="text-input" type="text" id="link" v-model="link" />
     </div>
 
     <div class="image-input">
@@ -88,7 +95,7 @@ const handleSubmit = async () => {
       <span class="info-span">Maximum rating – 10</span>
     </div>
 
-    <button type="submit">+ Add new book</button>
+    <button type="submit">+ Add new item</button>
   </form>
 </template>
 

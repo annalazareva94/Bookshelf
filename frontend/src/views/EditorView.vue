@@ -10,11 +10,10 @@ import { computed } from 'vue'
 const store = useEditorStore()
 
 const bookCounter = computed(() => {
-
   if (store.libraryBooks.length === 1) {
-    return `${store.libraryBooks.length} book`
+    return `${store.libraryBooks.length} item`
   } else {
-    return `${store.libraryBooks.length} books`
+    return `${store.libraryBooks.length} items`
   }
 })
 
@@ -57,7 +56,7 @@ function handleRemoveBookFromRating(book: Book, ratingId: number) {
         <div class="undistributed-books">
           <div class="books-staff">
             <img :src="bookIcon" />
-            <h3> UNSORTED BOOKS</h3>
+            <h3>UNSORTED ITEMS</h3>
             <span>{{ bookCounter }}</span>
           </div>
           <input

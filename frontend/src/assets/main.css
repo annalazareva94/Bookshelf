@@ -38,7 +38,7 @@ body {
 }
 
 .ghost .remove-btn {
-  display: none!important;
+  display: none !important;
 }
 
 .chosen {

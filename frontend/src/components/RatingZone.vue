@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import BookItem from './BookItem.vue'
 import RemoveButton from './RemoveButton.vue'
+import LinkButton from './LinkButton.vue'
 import type { Book } from '@/types'
 
 const props = defineProps<{
@@ -26,13 +27,11 @@ const emit = defineEmits<{
 const h3Ref = ref<HTMLElement | null>(null)
 
 const bookInZoneCounter = computed(() => {
-
   if (books.value.length === 1) {
-    return `${books.value.length} book`
+    return `${books.value.length} item`
   } else {
-    return `${books.value.length} books`
+    return `${books.value.length} items`
   }
-
 })
 
 // Устанавливаем начальный текст после монтирования.
@@ -81,7 +80,7 @@ function handleKeyDown(e: KeyboardEvent) {
   <div class="rating-zone">
     <div class="zone-info">
       <h3 ref="h3Ref" contenteditable="true" @blur="handleBlur" @keydown="handleKeyDown"></h3>
-      <p class="book-amount">{{bookInZoneCounter}}</p>
+      <p class="book-amount">{{ bookInZoneCounter }}</p>
     </div>
 
     <VueDraggable
@@ -94,6 +93,10 @@ function handleKeyDown(e: KeyboardEvent) {
       <div v-for="book in books" :key="book.id" class="book-container">
         <BookItem :book="book" :in-zone="true" />
         <RemoveButton @click="emit('remove-book', book)" />
+        <LinkButton
+          v-if="book.link"
+          :link="book.link"
+        />
       </div>
     </VueDraggable>
   </div>
@@ -107,7 +110,7 @@ function handleKeyDown(e: KeyboardEvent) {
   align-items: center;
   margin-left: 15px;
   min-height: 72px;
-  flex: 1 1 0%;
+  flex: 1 1 0;
 }
 
 .rating-zone .zone-info {
@@ -119,7 +122,6 @@ function handleKeyDown(e: KeyboardEvent) {
   align-items: center;
   text-align: center;
 }
-
 
 .rating-zone h3 {
   max-width: 80px;
@@ -159,36 +161,48 @@ function handleKeyDown(e: KeyboardEvent) {
   transition: opacity 0.15s;
 }
 
-.book-container:hover .remove-btn {
+.book-container .link-btn {
+  position: absolute;
+  top: -4px;
+  right: 16px;
+  width: 15px;
+  height: 15px;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.book-container:hover .remove-btn,
+.book-container:hover .link-btn{
   opacity: 1;
   z-index: 99;
 }
 
 .rating-zone .book-container {
   width: 76px;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
   cursor: grab;
   user-select: none;
 }
 
 .rating-zone .book-container:hover {
-    transform: translateY(-4px) rotate(1.5deg) scale(1.03);
+  transform: translateY(-4px) rotate(1.5deg) scale(1.03);
 }
 
 .rating-zone .book-container:hover .cover-frame img {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .rating-zone .book-container .cover-frame img[data-v-f4ad0d37] {
-    display: block;
-    vertical-align: middle;
-    transition-duration: 300ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
+  display: block;
+  vertical-align: middle;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
 }
-
-
 </style>

@@ -2,9 +2,10 @@
 import { VueDraggable } from 'vue-draggable-plus'
 import BookItem from './BookItem.vue'
 import RemoveButton from './RemoveButton.vue'
+import LinkButton from './LinkButton.vue'
 import type { Book } from '@/types'
 import { computed } from 'vue'
-import {useEditorStore} from "@/stores/editor";
+import { useEditorStore } from '@/stores/editor'
 
 const store = useEditorStore()
 
@@ -15,26 +16,24 @@ const emit = defineEmits<{
 }>()
 
 const visibleBooks = computed(() => {
-  const query = store.searchQuery.toLowerCase();
-  return books.value.filter((book) =>
-    book.title.toLowerCase().includes(query)
-  )
+  const query = store.searchQuery.toLowerCase()
+  return books.value.filter((book) => book.title.toLowerCase().includes(query))
 })
-
-
 </script>
 
 <template>
   <div class="book-list">
-    <p v-if="books.length === 0" class="empty-book-list">
-      Let's add new books!
-    </p>
+    <p v-if="books.length === 0" class="empty-book-list">Let's add new items!</p>
 
     <!-- Есть поиск: показываем отфильтрованный список без drag -->
     <div v-else-if="store.searchQuery" class="book-list-inner">
       <div v-for="book in visibleBooks" :key="book.id" class="book-item-wrapper">
         <BookItem :book="book" />
         <RemoveButton @click="emit('delete-book', book)" />
+        <LinkButton
+          v-if="book.link"
+          :link="book.link"
+        />
       </div>
     </div>
 
@@ -51,6 +50,10 @@ const visibleBooks = computed(() => {
       <div v-for="book in books" :key="book.id" class="book-item-wrapper">
         <BookItem :book="book" />
         <RemoveButton @click="emit('delete-book', book)" />
+        <LinkButton
+          v-if="book.link"
+          :link="book.link"
+        />
       </div>
     </VueDraggable>
   </div>
@@ -100,7 +103,16 @@ const visibleBooks = computed(() => {
   z-index: 99;
 }
 
-.book-list .book-item-wrapper:hover .remove-btn {
+.book-list .book-item-wrapper .link-btn {
+  display: none;
+  position: absolute;
+  top: -4px;
+  right: 16px;
+  z-index: 99;
+}
+
+.book-list .book-item-wrapper:hover .remove-btn,
+.book-list .book-item-wrapper:hover .link-btn{
   display: flex;
 }
 

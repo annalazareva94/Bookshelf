@@ -107,6 +107,4 @@ const props = defineProps<{
   border: unset;
   box-shadow: unset;
 }
-
-
 </style>
