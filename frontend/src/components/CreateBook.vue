@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import uploadIcon from '@/assets/img/upload-icon.svg'
 
 const emit = defineEmits<{
-  (e: 'book-created', book: { title: string; general_rating: number; cover: string, link: string }): void
+  (e: 'book-created', book: { title: string; general_rating: number; cover: string, link?: string }): void
 }>()
 
 const title = ref('')
