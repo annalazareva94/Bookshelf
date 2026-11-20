@@ -12,71 +12,113 @@ export const useCounterStore = defineStore('counter', () => {
 })
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
+  const user = ref(null)
+  const isAuthenticated = computed(() => user.value !== null)
+  const TOKEN_KEY = 'token'
 
-  const checkAuth = () => {
-    const user = localStorage.getItem('user')
-    isAuthenticated.value = !!user // true, если есть запись
+  // const resetAuth = () = {
+  //   user.value = null
+  //   localStorage.removeItem(TOKEN_KEY)
+  // }
+
+
+  const checkAuth = async () => {
+    const token = localStorage.getItem(TOKEN_KEY)
+    if(!token) {
+      user.value = null
+      return
+    } else {
+      try {
+        const response = await fetch('/api/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if(!response.ok) {
+          localStorage.removeItem(TOKEN_KEY)
+          user.value = null
+          return
+        } else {
+          user.value = await response.json();
+        }
+      } catch (e) {
+        console.error('checkAuth failed:', e)
+        user.value = null
+        localStorage.removeItem(TOKEN_KEY)
+      }
+    }
+
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if(!response.ok) {
+          const data = await response.json();
+          return { success: false, message: data.detail }
+        } else {
+          const data = await response.json();
+          const accessToken = data.access_token;
+          localStorage.setItem(TOKEN_KEY, accessToken)
+          await checkAuth()
+          return { success: true }
+        }
+      } catch (error) {
+        return { success: false, message: 'Сервер недоступен' }
+      }
   }
 
-  const checkUser = (email: string, password: string): boolean => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-    return users.some((u: any) => u.email === email && u.password === password)
-  }
-  const login = (email: string) => {
-    localStorage.setItem('user', JSON.stringify({ email }))
-    isAuthenticated.value = true
+
+  const logout = async () => {
+    localStorage.removeItem(TOKEN_KEY)
+    user.value = null
   }
 
-  const logout = () => {
-    localStorage.removeItem('user')
-    isAuthenticated.value = false
-  }
 
-  const register = (
-    name: string,
-    surname: string,
+  const register = async (
+    username: string,
     email: string,
     password: string,
   ) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
 
-    if (users.some((u: any) => u.email === email)) {
-      return { success: false, message: 'Этот email уже зарегистрирован' }
-    }
-
-    const newUser = {
-      name,
-      surname,
-      email,
-      password,
-    }
-
-    users.push(newUser)
-
-    localStorage.setItem('users', JSON.stringify(users))
-
-    return { success: true }
+    try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, email, password }),
+        });
+        const data = await response.json();
+        if(!response.ok) {
+          return { success: false, message: data.detail }
+        } else {
+          return { success: true }
+        }
+      } catch (error) {
+        return { success: false, message: 'Сервер недоступен' }
+      }
   }
 
-  const userEmail = computed(() => {
-    const data = localStorage.getItem('user')
-    return data ? JSON.parse(data).email : ''
-  })
+  const userEmail = computed(() => user.value.email ?? '')
 
-  const userData = computed(() => {
-    const currentUser = localStorage.getItem('user')
-    if (!currentUser) return null
-    const email = JSON.parse(currentUser).email
+  const userData = computed(() => user.value)
 
-    const users = JSON.parse(localStorage.getItem('users') || '[]')
-
-    const foundUser = users.find((u: any) => u.email === email)
-
-    return foundUser || null
-  })
-
-  checkAuth()
-
-  return { isAuthenticated, login, logout, userEmail, checkAuth, register, checkUser, userData }
+  return {
+    isAuthenticated,
+    login,
+    logout,
+    userEmail,
+    checkAuth,
+    register,
+    userData
+  }
 })

@@ -1,4 +1,4 @@
-<!--кнопка с ссылкой на элемент, в случае если пользователь ее добавил-->
+<!--a button with a link to an item, in case the user has added it (link)-->
 
 <script setup lang="ts">
 

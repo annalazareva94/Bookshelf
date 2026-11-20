@@ -17,7 +17,7 @@ const bookCounter = computed(() => {
   }
 })
 
-// ─── Обработчики событий от дочерних компонентов ───
+// ─── Event handlers from child components ───
 
 function handleBookCreated(book: Omit<Book, 'id'>) {
   store.addBook(book)
@@ -39,14 +39,14 @@ function handleRemoveBookFromRating(book: Book, ratingId: number) {
 <template>
   <div class="editor">
     <div class="shelf-block">
-      <!-- Левая колонка: полка с рейтингами -->
+      <!-- left column: shelf with raiting -->
       <TemplateBookshelf
         :template="store.template"
         @rename-rating="handleRenameRating"
         @remove-book="handleRemoveBookFromRating"
       />
 
-      <!-- Правая колонка: библиотека -->
+      <!-- right column: library -->
       <div class="library">
         <div class="library-form">
           <h1>Library</h1>

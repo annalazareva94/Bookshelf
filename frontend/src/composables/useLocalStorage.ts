@@ -1,17 +1,17 @@
-// type Ref — это TypeScript-тип (импортируется только для типизации, в рантайме не существует).
-// Ref<T> — тип «реактивная обёртка вокруг T».
+// type Ref — this is a TypeScript type (imported solely for type-checking purposes; it does not exist at runtime).
+// Ref<T> —"reactive wrapper around T" type.
 import { ref, watch, type Ref } from 'vue'
 
-// <T> — это generic, то есть «тип-параметр».
-// Это значит, что при вызове useLocalStorage<Book[]>('booksList',
-// []) Vue поймёт, что внутри лежит Book[], и подсветит ошибки типов.
-// Возвращаем Ref<T> — реактивную переменную с тем же типом, что и default.
+// <T> — This is a generic, or in other words, a "type parameter."
+// This means that when calling `useLocalStorage<Book[]>('booksList', [])`,
+// Vue will understand that it contains a `Book[]` and will highlight any type errors.
+// It returns a `Ref<T>` — a reactive variable with the same type as the `default` value.
 export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
   const saved = localStorage.getItem(key)
 
-  // Заводим переменную initial (объявлена через let, потому что будем её менять)
-  // и по умолчанию кладём туда defaultValue.
-  // Это запасной вариант, если в localStorage ничего нет или там сломанный JSON.
+  // We create a variable named `initial` (declared using `let` because we intend to change it).
+  // and by default, we put `defaultValue` in there.
+  // This is a fallback option for cases where there is nothing in localStorage or the JSON there is broken.
   let initial = defaultValue
 
   if (saved) {
@@ -24,7 +24,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
 
   const value = ref(initial) as Ref<T>
 
-  // Следим за value. Каждый раз, когда значение меняется, колбэк пишет обновлённый JSON в localStorage.
+  // We track the `value`. Each time the value changes, the callback writes the updated JSON to `localStorage`.
   watch(
     value,
     (newValue) => {
@@ -33,10 +33,10 @@ export function useLocalStorage<T>(key: string, defaultValue: T): Ref<T> {
     { deep: true },
   )
 
-  // Третий аргумент { deep: true } — критичный. Без него Vue следит только за ссылкой на объект/массив
-  // (то есть если вы замените массив целиком).
-  // С deep: true — следит за изменениями внутри, например books.value.push(...) или books.value[0].title = 'new'.
-  // У вас в редакторе массивы мутируются внутри, поэтому deep обязателен.
+  // The third argument, `{ deep: true }`, is critical. Without it, Vue only tracks the reference to the object or array
+  //   // (i.e., it only detects changes if you replace the entire array).
+  //   // With `deep: true`, it tracks internal changes—for example, `books.value.push(...)` or `books.value[0].title = 'new'`.
+  //   // Since your arrays are being mutated internally within the editor, `deep` is mandatory.
 
   return value
 }

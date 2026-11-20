@@ -56,7 +56,7 @@ export const useEditorStore = defineStore('editor', () => {
 
     rating.books = rating.books.filter((b) => b.id !== book.id)
 
-    // Если книги нет ни в одной зоне — вернуть в библиотеку
+    // If the book is not in any zone, return it to the library.
     const stillUsed = template.value.ratings.some((r) => r.books.some((b) => b.id === book.id))
     if (!stillUsed && !libraryBooks.value.some((b) => b.id === book.id)) {
       libraryBooks.value.push(book)

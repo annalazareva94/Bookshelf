@@ -18,7 +18,7 @@ const handleFileChange = (e: Event) => {
 }
 
 const handleSubmit = async () => {
-  // В Vue новая форма e.preventDefault() не нужна, если используем @submit.prevent в шаблоне.
+  // In Vue, the standard `e.preventDefault()` is not needed if you use `@submit.prevent` in the template.
 
   const ratingNumber = parseFloat(rating.value)
   if (isNaN(ratingNumber)) {
@@ -45,12 +45,12 @@ const handleSubmit = async () => {
 
   emit('book-created', { ...newBook, cover: coverDataUrl })
 
-  // сброс формы
+  // reset form
   title.value = ''
   imageFile.value = null
   rating.value = ''
 
-  // чистим input type=file, иначе выбранный файл останется в UI
+  // clearing input type=file, otherwise chosen file will remain в UI
   if (fileInputRef.value) fileInputRef.value.value = ''
 }
 </script>

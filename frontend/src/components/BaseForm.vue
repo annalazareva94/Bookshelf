@@ -1,4 +1,5 @@
-<!--это базовый темплейт для модалок, его структуру и стили можно будет переиспользовать под другие модалки на сайте-->
+<!--This is a base template for modals; its structure and styles can
+ be reused for other modals on the site.-->
 <template>
   <Teleport to="body">
     <Transition name="modal">

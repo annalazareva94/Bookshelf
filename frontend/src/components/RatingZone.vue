@@ -10,13 +10,13 @@ const props = defineProps<{
   name: string
 }>()
 
-// Двусторонняя привязка массива книг к родителю.
-// Родитель пишет: v-model:books="rating.books"
-// В Vue 3.4+ появился макрос defineModel.
-// Он заменяет собой старый паттерн «пропс + emit на каждое изменение»
-// Эта строчка делает две вещи:
-// Объявляет пропс books.
-// Автоматически создаёт событие update:books, которое эмитится при любом books.value = ....
+// Two-way binding of the `books` array to the parent component.
+// The parent uses: `v-model:books="rating.books"`
+// Vue 3.4+ introduced the `defineModel` macro.
+// It replaces the old pattern of "props + emitting an event on every change."
+// This single line performs two tasks:
+// It declares a `books` prop.
+// It automatically creates an `update:books` event, which is emitted whenever `books.value` is assigned a new value.
 const books = defineModel<Book[]>('books', { required: true })
 
 const emit = defineEmits<{
@@ -34,12 +34,12 @@ const bookInZoneCounter = computed(() => {
   }
 })
 
-// Устанавливаем начальный текст после монтирования.
+// We set the initial text after mounting.
 onMounted(() => {
   if (h3Ref.value) h3Ref.value.textContent = props.name
 })
 
-// Если родитель меняет name извне — синхронизируем DOM.
+//If a parent changes `name` from the outside, we synchronize the DOM.
 watch(
   () => props.name,
   (newName) => {
@@ -53,7 +53,7 @@ function handleBlur(e: FocusEvent) {
   const target = e.currentTarget as HTMLElement
   const newText = (target.textContent ?? '').trim()
 
-  // Пустое имя — откатываем к прежнему
+  // Empty name — reverting to the previous one
   if (!newText) {
     target.textContent = props.name
     return

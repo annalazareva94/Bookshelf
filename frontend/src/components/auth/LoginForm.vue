@@ -25,20 +25,23 @@
 
   const email = ref('');
   const password = ref('');
-  const errorMessage = ref('');
+  let errorMessage = ref('');
 
   const isOpen = defineModel<boolean>()
 
-  const handleLogin = () => {
-  if (authStore.checkUser(email.value, password.value)) {
-    authStore.login(email.value)
-    isOpen.value = false
+  const handleLogin = async () => {
     errorMessage.value = ''
+    const result = await authStore.login(
+      email.value,
+      password.value,
+    )
+  if (result.success) {
+    isOpen.value = false
     email.value = ''
     password.value = ''
     router.push('/user-profile');
   } else {
-    errorMessage.value = 'Wrong email or password'
+    errorMessage.value = result.message
   }
 }
 

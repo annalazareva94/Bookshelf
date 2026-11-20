@@ -25,7 +25,7 @@ const visibleBooks = computed(() => {
   <div class="book-list">
     <p v-if="books.length === 0" class="empty-book-list">Let's add new items!</p>
 
-    <!-- Есть поиск: показываем отфильтрованный список без drag -->
+    <!-- Search: we display a filtered list without drag-and-drop functionality. -->
     <div v-else-if="store.searchQuery" class="book-list-inner">
       <div v-for="book in visibleBooks" :key="book.id" class="book-item-wrapper">
         <BookItem :book="book" />
@@ -37,7 +37,7 @@ const visibleBooks = computed(() => {
       </div>
     </div>
 
-    <!-- Нет поиска: полный список с drag -->
+    <!-- No search: full list with drag and drop -->
     <VueDraggable
       v-else
       v-model="books"
