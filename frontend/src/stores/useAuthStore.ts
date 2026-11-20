@@ -12,7 +12,13 @@ export const useCounterStore = defineStore('counter', () => {
 })
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
+  interface User {
+    id: number
+    username: string
+    email: string
+  }
+
+  const user = ref<User | null>(null)
   const isAuthenticated = computed(() => user.value !== null)
   const TOKEN_KEY = 'token'
 
