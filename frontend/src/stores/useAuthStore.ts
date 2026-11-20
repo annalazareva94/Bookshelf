@@ -114,7 +114,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
   }
 
-  const userEmail = computed(() => user.value.email ?? '')
+  const userEmail = computed(() => user.value?.email ?? '')
 
   const userData = computed(() => user.value)
 
